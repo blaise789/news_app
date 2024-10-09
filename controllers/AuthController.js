@@ -47,6 +47,7 @@ class AuthController {
 
       const userExists = await prisma.user.findUnique({
         where: {
+        
           email: data.email,
         },
       });
@@ -62,7 +63,9 @@ class AuthController {
 
       }
       const payload={
-        email:userExists.email
+        id:userExists.id,
+        email:userExists.email,
+      
       }
     //   issue json web token
     const token=jwt.sign(payload,process.env.JWT_SECRET,{
