@@ -18,3 +18,20 @@ const bytesToMb=(bytes)=>{
 export const generateRandomNum=()=>{
     return uuid()
 }
+export const uploadImage=(image)=>{
+    const imgExt=image.name.split(".")[1]
+    const imageName=generateRandomNum()+"."+imgExt
+    const uploadPath=process.cwd()+"/public/images/"+imageName
+    console.log(uploadPath)
+    image.mv(uploadPath,(err)=>{
+       if(err) throw err
+
+    }
+    )
+    return imageName
+
+
+}
+export const getImageUrl=(imageName)=>{
+    return `${process.env.APP_URL}/images/${imageName}`
+}

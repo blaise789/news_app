@@ -69,7 +69,7 @@ class AuthController {
       }
     //   issue json web token
     const token=jwt.sign(payload,process.env.JWT_SECRET,{
-        expiresIn:"10m"
+        expiresIn:"60m"
         
     })
 
