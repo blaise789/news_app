@@ -1,7 +1,7 @@
 import vine, { errors } from "@vinejs/vine";
 import prisma from "../db.config.js";
 import NewsValidationSchema from "../validations/NewsValidation.js";
-import { imageValidator, uploadImage } from "../utils/helper.js";
+import { imageValidator, removeImage, uploadImage } from "../utils/helper.js";
 import NewsApiTransform from "../transform/NewsApiTransform.js";
 
 class NewsController {
@@ -114,7 +114,50 @@ class NewsController {
   }
   static async update(req,res){
     
+    const {id}=req.params
+    const user=req.user
+    const body=req.body
+    const news =await prisma.news.findUnique(
+      {
+        where:{
+          id:Number(id)
+        }
+      }
+
+    )
+    console.log(!news)
+    if (!news) {
+      return res.status(400).json({ message: "news not found" });
+    }
+  if (user.id!==news.user_id){
+    return res.status(401).json({message:"forbiden to mutate this resource"})
   }
+  // validating the schema
+  const validator= vine.compile(NewsValidationSchema)
+  const payload=await validator.validate(body)
+  const image=req.Files?.image
+  if(image){
+    const message=imageValidator(image.size,image.mimetype)
+    if(message==null){
+      return res.status(400).json({err:message})
+  
+    }
+   const imageName= uploadImage(image)
+    removeImage(news.image)
+   payload.image=imageName
+  } 
+  const updatedUser=await  prisma.news.update(
+    {
+      data:payload,
+      where:{
+        id:Number(id)
+      }
+    }
+  )
+return res.status(201).json({message:"updated successfully",updatedUser})
+  
+  }
+
   static async destroy(req, res) {}
 }
 export default NewsController;
