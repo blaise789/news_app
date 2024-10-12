@@ -1,4 +1,4 @@
-import prisma from "../db.config.js"
+import prisma from "../DB/db.config.js"
 import { generateRandomNum, imageValidator } from "../utils/helper.js"
 
 class ProfileController{

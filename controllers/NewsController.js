@@ -1,8 +1,9 @@
 import vine, { errors } from "@vinejs/vine";
-import prisma from "../db.config.js";
+import prisma from "../DB/db.config.js";
 import NewsValidationSchema from "../validations/NewsValidation.js";
 import { imageValidator, removeImage, uploadImage } from "../utils/helper.js";
 import NewsApiTransform from "../transform/NewsApiTransform.js";
+import redisCache from "../DB/redis.config.js";
 
 class NewsController {
   static async getNews(req, res) {
@@ -72,6 +73,11 @@ class NewsController {
       console.log(data);
 
       const savedNews = await prisma.news.create({ data });
+      redisCache.del("/api/news",(err)=>{
+      if(err) throw err;
+
+      }
+    )
 
       return res
         .status(201)
@@ -125,7 +131,6 @@ class NewsController {
       }
 
     )
-    console.log(!news)
     if (!news) {
       return res.status(400).json({ message: "news not found" });
     }
@@ -135,17 +140,19 @@ class NewsController {
   // validating the schema
   const validator= vine.compile(NewsValidationSchema)
   const payload=await validator.validate(body)
-  const image=req.Files?.image
+  const image=req.files?.image
+  console.log(image)
   if(image){
     const message=imageValidator(image.size,image.mimetype)
-    if(message==null){
+    if(message!=null){
       return res.status(400).json({err:message})
   
     }
    const imageName= uploadImage(image)
-    removeImage(news.image)
+   removeImage(news.image)
    payload.image=imageName
   } 
+  console.log(payload)
   const updatedUser=await  prisma.news.update(
     {
       data:payload,

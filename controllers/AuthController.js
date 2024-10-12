@@ -1,6 +1,6 @@
 import vine, { errors } from "@vinejs/vine";
 import { loginSchema, registerSchema } from "../validations/AuthValidation.js";
-import prisma from "../db.config.js";
+import prisma from "../DB/db.config.js";
 import  bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
 
