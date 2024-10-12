@@ -158,6 +158,27 @@ return res.status(201).json({message:"updated successfully",updatedUser})
   
   }
 
-  static async destroy(req, res) {}
+  static async destroy(req, res) {
+const {id}=req.params
+const user=req.user
+const news=await prisma.news.findFirst(
+  {
+    where:{
+      id:Number(id)
+    }
+  }
+)
+if(!news){
+  return res.status(400).json({message:"news not found"})
+}
+if (user.id!==news.user_id){
+  return res.status(401).json({message:"forbiden to delete this resource"})
+}
+removeImage(news.image)
+await prisma.news.delete({where:{id:Number(id)}})
+return res.status(204).json({message:"news deleted successfully"})
+
+
+  }
 }
 export default NewsController;

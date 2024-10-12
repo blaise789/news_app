@@ -37,6 +37,8 @@ export const getImageUrl=(imageName)=>{
     return `${process.env.APP_URL}/images/${imageName}`
 }
 export const removeImage=(imageName)=>{
-    const filePath=process.cwd()+"/public/images"+imageName
-    if(fs.existsSync(filePath)) fs.unlinkSync(filePath)
+    const filePath=process.cwd()+"/public/images/"+imageName
+    console.log(filePath)
+    console.log(fs.existsSync(filePath))
+    if(fs.existsSync(filePath)) {fs.unlinkSync(filePath)}
 }
